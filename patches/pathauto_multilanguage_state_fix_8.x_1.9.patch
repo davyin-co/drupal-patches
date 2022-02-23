@@ -1,0 +1,65 @@
+diff --git a/src/PathautoState.php b/src/PathautoState.php
+index aca460e..aef4c1f 100644
+--- a/src/PathautoState.php
++++ b/src/PathautoState.php
+@@ -68,7 +68,7 @@ class PathautoState extends TypedData {
+       // If no value has been set or loaded yet, try to load a value if this
+       // entity has already been saved.
+       $this->originalValue = \Drupal::keyValue($this->getCollection())
+-        ->get(static::getPathautoStateKey($this->parent->getEntity()->id()));
++        ->get(static::getPathautoStateKey($this->parent->getEntity()->id(), $this->parent->getLangcode()));
+     }
+ 
+     return $this->originalValue;
+@@ -102,7 +102,7 @@ class PathautoState extends TypedData {
+     }
+ 
+     \Drupal::keyValue($this->getCollection())
+-      ->set(static::getPathautoStateKey($this->parent->getEntity()->id()), $this->getValue());
++      ->set(static::getPathautoStateKey($this->parent->getEntity()->id(), $this->parent->getLangcode()), $this->getValue());
+   }
+ 
+   /**
+@@ -110,7 +110,7 @@ class PathautoState extends TypedData {
+    */
+   public function purge() {
+     \Drupal::keyValue($this->getCollection())
+-      ->delete(static::getPathautoStateKey($this->parent->getEntity()->id()));
++      ->delete(static::getPathautoStateKey($this->parent->getEntity()->id(), $this->parent->getLangcode()));
+   }
+ 
+   /**
+@@ -132,8 +132,12 @@ class PathautoState extends TypedData {
+    */
+   public static function bulkDelete($entity_type_id, array $pids_by_id) {
+     foreach ($pids_by_id as $id => $pid) {
++      $parts = explode(':', $id);
++      if(!isset($parts[1])) {
++        $parts[1] = '';
++      }
+       // Some key-values store entries have computed keys.
+-      $key = static::getPathautoStateKey($id);
++      $key = static::getPathautoStateKey($parts[0], $parts[1]);
+       if ($key !== $id) {
+         $pids_by_id[$key] = $pid;
+         unset($pids_by_id[$id]);
+@@ -174,13 +178,14 @@ class PathautoState extends TypedData {
+    *
+    * @see \Drupal\Core\Cache\DatabaseBackend::normalizeCid()
+    */
+-  public static function getPathautoStateKey($entity_id) {
+-    $entity_id_is_ascii = mb_check_encoding($entity_id, 'ASCII');
+-    if ($entity_id_is_ascii && strlen($entity_id) <= 128) {
++  public static function getPathautoStateKey($entity_id, $langcode) {
++    $key = "{$entity_id}:{$langcode}";
++    $entity_id_is_ascii = mb_check_encoding($key, 'ASCII');
++    if ($entity_id_is_ascii && strlen($key) <= 128) {
+       // The original entity ID, if it's an ASCII of 128 characters or less.
+-      return $entity_id;
++      return $key;
+     }
+-    return Crypt::hashBase64($entity_id);
++    return Crypt::hashBase64($key);
+   }
+ 
+ }
