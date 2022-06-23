@@ -1,0 +1,13 @@
+diff --git a/pathologic.module b/pathologic.module
+index b7e145c..283c62e 100644
+--- a/pathologic.module
++++ b/pathologic.module
+@@ -327,7 +327,7 @@ function _pathologic_replace($matches) {
+     'options' => [
+       // Force the query to an array if it's unspecified.
+       'query' => $parts['qparts'] ?: [],
+-      'path_processing' => TRUE,
++      'path_processing' => !empty($parts['language_obj']),
+       'fragment' => isset($parts['fragment']) ? $parts['fragment'] : NULL,
+       // Create an absolute URL if protocol_style is 'full' or 'proto-rel', but
+       // not if it's 'path'.
