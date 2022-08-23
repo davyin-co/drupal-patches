@@ -1,0 +1,19 @@
+diff --git a/js/layout-tab-scripts.js b/js/layout-tab-scripts.js
+index d2d557d..0d51b32 100644
+--- a/js/layout-tab-scripts.js
++++ b/js/layout-tab-scripts.js
+@@ -45,7 +45,13 @@
+ 
+           // Provide a graphical representation of the columns via some nifty divs styling.
+           $.each(colsConfig, function(index, value) {
+-            var width = ((value / numOfCols) * 100);
++            var width;
++            if (value.indexOf("%") != -1) {
++              width = (value.replace('%', "") * 1);
++            }else {
++              width = ((value / numOfCols) * 100);
++            }
++
+             $('<div />', {
+               'text': width.toFixed(0) + '%',
+               'style': 'width:' + width + '%;',
