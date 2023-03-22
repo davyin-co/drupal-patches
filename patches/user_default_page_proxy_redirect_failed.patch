@@ -1,0 +1,17 @@
+diff --git a/user_default_page.module b/user_default_page.module
+index f92284f..1d319dd 100644
+--- a/user_default_page.module
++++ b/user_default_page.module
+@@ -223,11 +223,7 @@ function user_default_page_redirect($path) {
+   if ($url_object) {
+     $url_object->setAbsolute();
+     $url = $url_object->toString();
+-    $response = new RedirectResponse($url);
+-  }
+-
+-  if (isset($response)) {
+-    $response->send();
++    \Drupal::service('request_stack')->getCurrentRequest()->query->set('destination', $url);
+   }
+   else {
+     $message = t('The system attempted to redirect to %path, but the page is not valid', ['%path' => $path]);

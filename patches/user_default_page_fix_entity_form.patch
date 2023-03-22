@@ -1,26 +1,22 @@
 diff --git a/src/Form/UserDefaultPageConfigEntityForm.php b/src/Form/UserDefaultPageConfigEntityForm.php
-index bd7651a..2cea609 100644
+index bd7651a..9a5f9ca 100644
 --- a/src/Form/UserDefaultPageConfigEntityForm.php
 +++ b/src/Form/UserDefaultPageConfigEntityForm.php
-@@ -115,7 +115,7 @@ class UserDefaultPageConfigEntityForm extends EntityForm {
-     $form['roles_fieldset']['markup'] = [
-       '#markup' => '<b>' . $this->t('Select Role or User or both.') . '</b>',
-     ];
--    $user_values = $user_default_page_config_entity->getUsers();
-+    $user_values = $user_default_page_config_entity->getUsers() ?? '';
-     $uids = explode(',', $user_values);
+@@ -254,15 +254,15 @@ class UserDefaultPageConfigEntityForm extends EntityForm {
+     $input = $form_state->getUserInput();
+     $user_default_page_config_entity = $this->entity;
+     $user_input = $input['users'];
++    $users_array = '';
+     if (!empty($user_input)) {
+       $uids = explode(',', $user_input);
+-      $users_array = '';
+       foreach ($uids as $uid) {
+         preg_match('#\((.*?)\)#', $uid, $match);
+         $users_array .= $match[1] . ',';
+       }
+-      $user_default_page_config_entity->setUsers($users_array);
+     }
++    $user_default_page_config_entity->setUsers($users_array);
+     $status = $user_default_page_config_entity->save();
  
-     $user_entity = $this->entityTypeManager->getStorage('user');
-diff --git a/src/UserDefaultPageConfigEntityListBuilder.php b/src/UserDefaultPageConfigEntityListBuilder.php
-index 6c766ee..d7c35a9 100644
---- a/src/UserDefaultPageConfigEntityListBuilder.php
-+++ b/src/UserDefaultPageConfigEntityListBuilder.php
-@@ -31,7 +31,7 @@ class UserDefaultPageConfigEntityListBuilder extends ConfigEntityListBuilder {
-    * {@inheritdoc}
-    */
-   public function buildRow(EntityInterface $entity) {
--    $user_values = $entity->getUsers();
-+    $user_values = $entity->getUsers() ?? '';
-     $uids = explode(',', $user_values);
-     $default_users = User::loadMultiple($uids);
-     $default_value = EntityAutocomplete::getEntityLabels($default_users);
+     switch ($status) {
