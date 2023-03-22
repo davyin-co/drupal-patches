@@ -1,0 +1,13 @@
+diff --git a/src/Form/UserDefaultPageConfigEntityForm.php b/src/Form/UserDefaultPageConfigEntityForm.php
+index bd7651a..2cea609 100644
+--- a/src/Form/UserDefaultPageConfigEntityForm.php
++++ b/src/Form/UserDefaultPageConfigEntityForm.php
+@@ -115,7 +115,7 @@ class UserDefaultPageConfigEntityForm extends EntityForm {
+     $form['roles_fieldset']['markup'] = [
+       '#markup' => '<b>' . $this->t('Select Role or User or both.') . '</b>',
+     ];
+-    $user_values = $user_default_page_config_entity->getUsers();
++    $user_values = $user_default_page_config_entity->getUsers() ?? '';
+     $uids = explode(',', $user_values);
+ 
+     $user_entity = $this->entityTypeManager->getStorage('user');

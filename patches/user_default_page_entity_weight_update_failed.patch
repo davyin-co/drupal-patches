@@ -1,0 +1,14 @@
+diff --git a/src/Entity/UserDefaultPageConfigEntity.php b/src/Entity/UserDefaultPageConfigEntity.php
+index 9721f19..0f27a79 100644
+--- a/src/Entity/UserDefaultPageConfigEntity.php
++++ b/src/Entity/UserDefaultPageConfigEntity.php
+@@ -36,7 +36,8 @@ use Drupal\user_default_page\UserDefaultPageConfigEntityInterface;
+  *     "login_redirect",
+  *     "login_redirect_message",
+  *     "logout_redirect",
+- *     "logout_redirect_message"
++ *     "logout_redirect_message",
++ *     "weight"
+  *   },
+  *   links = {
+  *     "canonical" = "/admin/config/people/user_default_page/{user_default_page_config_entity}",
