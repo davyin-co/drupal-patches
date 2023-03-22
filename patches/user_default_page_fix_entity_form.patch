@@ -11,3 +11,16 @@ index bd7651a..2cea609 100644
      $uids = explode(',', $user_values);
  
      $user_entity = $this->entityTypeManager->getStorage('user');
+diff --git a/src/UserDefaultPageConfigEntityListBuilder.php b/src/UserDefaultPageConfigEntityListBuilder.php
+index 6c766ee..d7c35a9 100644
+--- a/src/UserDefaultPageConfigEntityListBuilder.php
++++ b/src/UserDefaultPageConfigEntityListBuilder.php
+@@ -31,7 +31,7 @@ class UserDefaultPageConfigEntityListBuilder extends ConfigEntityListBuilder {
+    * {@inheritdoc}
+    */
+   public function buildRow(EntityInterface $entity) {
+-    $user_values = $entity->getUsers();
++    $user_values = $entity->getUsers() ?? '';
+     $uids = explode(',', $user_values);
+     $default_users = User::loadMultiple($uids);
+     $default_value = EntityAutocomplete::getEntityLabels($default_users);
