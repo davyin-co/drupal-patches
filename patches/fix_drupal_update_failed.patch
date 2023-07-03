@@ -1,0 +1,13 @@
+diff --git a/user_display_name.post_update.php b/user_display_name.post_update.php
+index fe51743..2b0ef22 100644
+--- a/user_display_name.post_update.php
++++ b/user_display_name.post_update.php
+@@ -54,7 +54,7 @@ function user_display_name_post_update_convert_field_definition(&$sandbox) {
+       ->select('users', 'u')
+       ->countQuery()
+       ->execute()
+-      ?->fetchField() ?? 0;
++      ->fetchField() ?? 0;
+   }
+ 
+   return t('@progress/@total user entities updated', [

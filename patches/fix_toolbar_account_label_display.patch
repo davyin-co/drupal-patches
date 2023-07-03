@@ -1,0 +1,14 @@
+diff --git a/user_display_name.module b/user_display_name.module
+index 06f7040..b03c364 100644
+--- a/user_display_name.module
++++ b/user_display_name.module
+@@ -64,6 +64,9 @@ function user_display_name_user_prepare_form(UserInterface $user, $operation, Fo
+  * Implements hook_user_format_name_alter().
+  */
+ function user_display_name_user_format_name_alter(&$name, AccountInterface $account) {
++  if ($account->isAuthenticated() && !($account instanceof UserInterface)) {
++    $account = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
++  }
+   if (!empty($account->display_name->value)) {
+     $name = $account->display_name->value;
+   }
