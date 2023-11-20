@@ -9,7 +9,6 @@ index ee52e2a65..90dba6e2b 100644
 -    return $this->casRedirector->buildRedirectResponse($cas_redirect_data, TRUE);
 +    $response = $this->casRedirector->buildRedirectResponse($cas_redirect_data, TRUE);
 +    $response->send();
-+    return [];
    }
  
  }
