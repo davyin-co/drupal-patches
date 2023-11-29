@@ -1,0 +1,34 @@
+diff --git a/src/CopySectionRender.php b/src/CopySectionRender.php
+index 7cd881b2e..06cb08176 100644
+--- a/src/CopySectionRender.php
++++ b/src/CopySectionRender.php
+@@ -37,7 +37,7 @@ public static function preRender($element) {
+
+       // Check what kind of element we are looping over.
+       $is_add_link = isset($layout[$id]['link']) && isset($layout[$id]['link']['#url']);
+-      $is_section = isset($layout[$id]['configure']) && isset($layout[$id]['configure']['#url']);
++      $is_section = isset($layout[$id]['actions']['configure']) && isset($layout[$id]['actions']['configure']['#url']);
+
+       if ($is_add_link && !empty($copied_section)) {
+
+@@ -73,7 +73,7 @@ public static function preRender($element) {
+       elseif ($is_section) {
+
+         // Collect parameters to generate the link.
+-        $parameters = $layout[$id]['configure']['#url']->getRouteParameters();
++        $parameters = $layout[$id]['actions']['configure']['#url']->getRouteParameters();
+         $active_section = $section_storage->getSections()[$parameters['delta']];
+         $layout_settings = $active_section->getLayoutSettings();
+         $section_label = !empty($layout_settings['label']) ? $layout_settings['label'] : t('Section @section', ['@section' => $parameters['delta'] + 1]);
+@@ -95,9 +95,9 @@ public static function preRender($element) {
+             ],
+           ],
+         );
+-        $layout[$id]['copy'] = [
++        $layout[$id]['actions']['copy'] = [
+           '#type' => 'link',
+-          '#title' => t('Copy @section', ['@section' => $section_label]),
++          '#title' => t('<span class="visually-hidden">Copy @section</span>', ['@section' => $section_label]),
+           '#url' => $copy_section_url,
+           '#access' => $copy_section_url->access(),
+           '#weight' => 4,
