@@ -1,0 +1,22 @@
+diff --git a/docroot/modules/contrib/layoutcomponents/src/LcPage.php b/docroot/modules/contrib/layoutcomponents/src/LcPage.php
+index 722d7eb6..22c3b9e9 100644
+--- a/docroot/modules/contrib/layoutcomponents/src/LcPage.php
++++ b/docroot/modules/contrib/layoutcomponents/src/LcPage.php
+@@ -4,7 +4,7 @@
+ 
+ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+-use Drupal\Core\Extension\ModuleHandler;
++use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Config\ConfigFactoryInterface;
+ use Symfony\Component\HttpFoundation\RequestStack;
+ use Drupal\path_alias\AliasManager;
+@@ -53,7 +53,7 @@ class LcPage implements ContainerInjectionInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public function __construct(ModuleHandler $module_handler, ConfigFactoryInterface $config_factory, RequestStack $request, AliasManager $alias_manager, CurrentPathStack $current_path_stack) {
++  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, RequestStack $request, AliasManager $alias_manager, CurrentPathStack $current_path_stack) {
+     $this->moduleHandler = $module_handler;
+     $this->configFactory = $config_factory;
+     $this->request = $request->getCurrentRequest();
