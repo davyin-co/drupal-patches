@@ -8,7 +8,7 @@ index 6c9ab5f..de7cb6a 100644
        if ($lock->uid != $uid) {
 -        // Send message.
 -        $message = $this->displayLockOwner($lock);
--        drupal_set_message($message, 'warning');
+-        \Drupal::messenger()->addMessage($message, 'warning');
 -
 -        // Higher permission user can unblock.
 -        if ($this->currentUser->hasPermission('break content lock')) {
@@ -21,11 +21,11 @@ index 6c9ab5f..de7cb6a 100644
 -          )->toString();
 -
 -          // Let user break lock.
--          drupal_set_message($this->t('Click here to @link', ['@link' => $link]), 'warning');
+-          \Drupal::messenger()->addMessage($this->t('Click here to @link', ['@link' => $link]), 'warning');
 +        if ($this->verbose() && !$quiet) {
 +            // Send message.
 +            $message = $this->displayLockOwner($lock);
-+            drupal_set_message($message, 'warning');
++            \Drupal::messenger()->addMessage($message, 'warning');
 +
 +            // Higher permission user can unblock.
 +            if ($this->currentUser->hasPermission('break content lock')) {
@@ -38,7 +38,7 @@ index 6c9ab5f..de7cb6a 100644
 +              )->toString();
 +
 +              // Let user break lock.
-+              drupal_set_message($this->t('Click here to @link', ['@link' => $link]), 'warning');
++              \Drupal::messenger()->addMessage($this->t('Click here to @link', ['@link' => $link]), 'warning');
 +            }
          }
  
