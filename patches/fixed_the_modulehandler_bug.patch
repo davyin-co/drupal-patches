@@ -1,7 +1,7 @@
-diff --git a/docroot/modules/contrib/layoutcomponents/src/LcPage.php b/docroot/modules/contrib/layoutcomponents/src/LcPage.php
+diff --git a/src/LcPage.php b/src/LcPage.php
 index 722d7eb6..22c3b9e9 100644
---- a/docroot/modules/contrib/layoutcomponents/src/LcPage.php
-+++ b/docroot/modules/contrib/layoutcomponents/src/LcPage.php
+--- a/src/LcPage.php
++++ b/src/LcPage.php
 @@ -4,7 +4,7 @@
  
  use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
