@@ -79,7 +79,7 @@ index 92c6110b..3ca54b06 100644
 +        $logger->debug('Parser Variables : ' . print_r($variables,1));
 +      }catch(\Exception $e){
 +        watchdog_exception('color', $e);
-+        drupal_set_message("Less complie error : " . $e->getMessage(),'error');
++        \Drupal::messenger()->addMessage("Less complie error : " . $e->getMessage(),'error');
 +      }
 +    }else{
 +      // Build a temporary array with CSS files.
