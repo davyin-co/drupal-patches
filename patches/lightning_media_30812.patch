@@ -1,0 +1,34 @@
+diff --git a/src/Exception/IndeterminateBundleException.php b/src/Exception/IndeterminateBundleException.php
+index bd1a9ad52..914dba801 100755
+--- a/src/Exception/IndeterminateBundleException.php
++++ b/src/Exception/IndeterminateBundleException.php
+@@ -78,14 +78,14 @@ public function __toString() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function count() {
++  public function count(): int {
+     return count($this->types);
+   }
+ 
+   /**
+    * {@inheritdoc}
+    */
+-  public function getIterator() {
++  public function getIterator():\Traversable {
+     return new \ArrayIterator($this->types);
+   }
+ 
+diff --git a/src/Form/MediaForm.php b/src/Form/MediaForm.php
+index 3a2d4a89b..ee9c23f03 100755
+--- a/src/Form/MediaForm.php
++++ b/src/Form/MediaForm.php
+@@ -118,7 +118,7 @@ public function save(array $form, FormStateInterface $form_state) {
+     // If there are no more entities to create, redirect to the collection.
+     if (empty($queue)) {
+       try {
+-        $form_state->setRedirectUrl($entity->toUrl('collection'));
++        $form_state->setRedirectUrl(\Drupal\Core\Url::fromRoute('manage.media_grid'));
+       }
+       catch (UndefinedLinkTemplateException $e) {
+         // The entity type does not declare a collection, so don't do
