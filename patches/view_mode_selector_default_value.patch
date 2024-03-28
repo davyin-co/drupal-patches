@@ -1,0 +1,22 @@
+diff --git a/docroot/modules/contrib/view_mode_selector/view_mode_selector.module b/docroot/modules/contrib/view_mode_selector/view_mode_selector.module
+index 9f6a4ac4c..31fc80246 100644
+--- a/docroot/modules/contrib/view_mode_selector/view_mode_selector.module
++++ b/docroot/modules/contrib/view_mode_selector/view_mode_selector.module
+@@ -13,13 +13,13 @@
+  * Implements hook_entity_view_mode_alter().
+  */
+ function view_mode_selector_entity_view_mode_alter(&$view_mode, EntityInterface $entity, $context) {
+-  if ($view_mode !== 'view_mode_selector') {
+-    return;
+-  }
++  // if ($view_mode !== 'view_mode_selector') {
++  //   return;
++  // }
+ 
+   // Set view mode to 'Default', this is for entities without
+   // a view mode selector field.
+-  $view_mode = 'default';
++  $view_mode = $view_mode ?? 'default';
+ 
+   // Find the first view mode selector field and change the view mode.
+   $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle());
