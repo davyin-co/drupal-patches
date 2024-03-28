@@ -1,0 +1,18 @@
+diff --git a/src/Form/AutosaveFormBuilder.php b/src/Form/AutosaveFormBuilder.php
+index b23f82e..b4d77e1 100644
+--- a/src/Form/AutosaveFormBuilder.php
++++ b/src/Form/AutosaveFormBuilder.php
+@@ -31,6 +31,13 @@ class AutosaveFormBuilder extends FormBuilder {
+
+   use AutosaveButtonClickedTrait;
+
++  /**
++   * The service ID
++   *
++   * @var string
++   */
++  public $_serviceId = 'autosave_form.form_builder';
++
+   /**
+    * The form builder service.
+    *
