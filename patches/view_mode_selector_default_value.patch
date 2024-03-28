@@ -1,7 +1,7 @@
-diff --git a/docroot/modules/contrib/view_mode_selector/view_mode_selector.module b/docroot/modules/contrib/view_mode_selector/view_mode_selector.module
+diff --git a/view_mode_selector.module b/view_mode_selector.module
 index 9f6a4ac4c..31fc80246 100644
---- a/docroot/modules/contrib/view_mode_selector/view_mode_selector.module
-+++ b/docroot/modules/contrib/view_mode_selector/view_mode_selector.module
+--- a/view_mode_selector.module
++++ b/view_mode_selector.module
 @@ -13,13 +13,13 @@
   * Implements hook_entity_view_mode_alter().
   */
