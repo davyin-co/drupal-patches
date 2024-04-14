@@ -1,0 +1,330 @@
+diff --git a/src/Controller/CopySectionController.php b/src/Controller/CopySectionController.php
+index 4ba9fa2..f82c42e 100644
+--- a/src/Controller/CopySectionController.php
++++ b/src/Controller/CopySectionController.php
+@@ -14,6 +14,7 @@ use Drupal\layout_builder\SectionStorageInterface;
+ use Drupal\lb_copy_section\DeepCloningTrait;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ use Symfony\Component\HttpFoundation\RedirectResponse;
++use Drupal\layout_builder\LayoutEntityHelperTrait;
+ 
+ /**
+  * Class CopySectionController.
+@@ -26,11 +27,12 @@ class CopySectionController implements ContainerInjectionInterface {
+   use LayoutRebuildTrait;
+   use DeepCloningTrait;
+   use StringTranslationTrait;
++  use LayoutEntityHelperTrait;
+ 
+   /**
+    * Private storage.
+    *
+-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
++   * @var \Drupal\Core\TempStore\PrivateTempStore
+    */
+   protected $privateTempStore;
+ 
+@@ -92,6 +94,13 @@ class CopySectionController implements ContainerInjectionInterface {
+       $layout_settings = $section->getLayoutSettings();
+       $section_label = !empty($layout_settings['label']) ? $layout_settings['label'] : $this->t('Section @section', ['@section' => $delta + 1]);
+ 
++      // Process sub sections.
++      if (isset($layout_settings['lc_id'])) {
++        $sections = $section_storage->getSections();
++        $child = $this->getSubSections($sections, $layout_settings['lc_id']);
++        $section->setThirdPartySetting('copy_section', 'children', $child);
++      }
++
+       // Put the sections and its label in the tempstore for future use.
+       $this->privateTempStore->set('copied_section', $section);
+       $this->privateTempStore->set('copied_section_label', $section_label);
+@@ -112,18 +121,28 @@ class CopySectionController implements ContainerInjectionInterface {
+    *   A render array.
+    */
+   public function paste(SectionStorageInterface $section_storage, $delta) {
++    /** @var \Drupal\layout_builder\Section $tempstore_section */
+     $tempstore_section = $this->privateTempStore->get('copied_section');
+ 
+     // Pasting is only possible if there is a section in the tempstore.
+     if (!empty($tempstore_section)) {
+       $tempstore_section_array = $tempstore_section->toArray();
++      unset($tempstore_section_array['third_party_settings']['copy_section']);
++
++      $layout_settings = $tempstore_section->getLayoutSettings();
++      // Set new lc_id when layout has lc_id.
++      if (isset($layout_settings['lc_id']) && !empty($layout_settings['lc_id'])) {
++        $original_layout_settings = $layout_settings;
++        $new_uuid = $this->uuidGenerator->generate();
++        $layout_settings['lc_id'] = $new_uuid;
++      }
+ 
+       // Clone section.
+       $cloned_section = new Section(
+         $tempstore_section->getLayoutId(),
+-        $tempstore_section->getLayoutSettings(),
++        $layout_settings,
+         $tempstore_section->getComponents(),
+-        $tempstore_section_array['third_party_settings']
++        $tempstore_section_array['third_party_settings'],
+       );
+ 
+       // Replace section components with new instances
+@@ -135,6 +154,11 @@ class CopySectionController implements ContainerInjectionInterface {
+ 
+       // Update layout builder tempstore so everything keeps working properly.
+       $this->layoutTempstoreRepository->set($section_storage);
++
++      $children = $tempstore_section->getThirdPartySetting('copy_section', 'children');
++      if ($children) {
++        $this->generateSubSection($section_storage, $delta, $layout_settings['lc_id'], $children);
++      }
+     }
+ 
+     return $this->rebuild($section_storage);
+@@ -159,4 +183,112 @@ class CopySectionController implements ContainerInjectionInterface {
+     }
+   }
+ 
++  private function getSubSections($sections, $lc_id) {
++    $children = [];
++
++    foreach ($sections as $section) {
++      $layout_settings = $section->getLayoutSettings();
++      if (isset($layout_settings['sub_section']['lc_id']) && $layout_settings['sub_section']['lc_id'] == $lc_id) {
++        if (isset($layout_settings['lc_id'])) {
++          $child = $this->getSubSections($sections, $layout_settings['lc_id']);
++          $section->setThirdPartySetting('copy_section', 'children', $child);
++        }
++        $children[] = $section;
++      }
++    }
++
++    return $children;
++  }
++
++  /**
++   *
++   * @var \Drupal\layout_builder\Section[] $sections
++   */
++  private function generateSubSection(SectionStorageInterface $section_storage, $delta, $new_lc_id, $sections) {
++    foreach ($sections as $section) {
++      $original_layout_settings = $layout_settings = $section->getLayoutSettings();
++
++      // Generate new uuid for lc_id.
++      if (isset($layout_settings['lc_id']) && !empty($layout_settings['lc_id'])) {
++        $new_uuid = $this->uuidGenerator->generate();
++        $layout_settings['lc_id'] = $new_uuid;
++      }
++
++      $section_array = $section->toArray();
++      unset($section_array['third_party_settings']['copy_section']);
++
++      // Set new parent lc_id.
++      if (isset($layout_settings['sub_section']['lc_id'])) {
++        $layout_settings['sub_section']['lc_id'] = $new_lc_id;
++      }
++
++      // Clone section.
++      $cloned_section = new Section(
++        $section->getLayoutId(),
++        $layout_settings,
++        $section->getComponents(),
++        $section_array['third_party_settings'],
++      );
++
++      $deep_cloned_section = $this->cloneAndReplaceSectionComponents($cloned_section);
++
++      // Create a new section.
++      $section_storage->insertSection(++$delta, $deep_cloned_section);
++
++      // Update layout builder tempstore so everything keeps working properly.
++      $this->layoutTempstoreRepository->set($section_storage);
++
++      $children = $section->getThirdPartySetting('copy_section', 'children');
++      if ($children) {
++        $this->generateSubSection($section_storage, $delta, $layout_settings['lc_id'], $children);
++      }
++    }
++  }
++
++  // private function generateSubSection(SectionStorageInterface $section_storage, $delta, $lc_id, $new_lc_id, $entity = NULL) {
++  //   $sections = $section_storage->getSections();
++  //   foreach ($sections as $section) {
++  //     // $configuration['sub_section'] = [
++  //     //   'lc_id' => $new_uuid,
++  //     //   'parent_section' => $parent_section,
++  //     //   'parent_region' => $parent_region,
++  //     // ];
++  //     $layout_settings = $section->getLayoutSettings();
++  //     if (isset($layout_settings['sub_section']['lc_id']) && $layout_settings['sub_section']['lc_id'] == $lc_id) {
++  //       // Set new lc_id for sub section when it has lc_id.
++  //       if (isset($layout_settings['lc_id']) && !empty($layout_settings['lc_id'])) {
++  //         $new_uuid = \Drupal::service('uuid')->generate();
++  //         $layout_settings['lc_id'] = $new_uuid;
++  //       }
++
++  //       // Set new parent lc_id.
++  //       $layout_settings['sub_section']['lc_id'] = $new_lc_id;
++
++  //       $section_array = $section->toArray();
++
++  //       // Clone section.
++  //       $cloned_section = new Section(
++  //         $section->getLayoutId(),
++  //         $layout_settings,
++  //         $section->getComponents(),
++  //         $section_array['third_party_settings'],
++  //       );
++
++  //       $deep_cloned_section = $this->cloneAndReplaceSectionComponents($cloned_section);
++
++  //       // Create a new section.
++  //       $section_storage->insertSection($delta, $deep_cloned_section);
++
++  //       // Update layout builder tempstore so everything keeps working properly.
++  //       $this->layoutTempstoreRepository->set($section_storage);
++
++  //       if (isset($layout_settings['lc_id'])) {
++  //         $original_layout_settings = $section->getLayoutSettings();
++  //         $new_sub_lc_id = $layout_settings['lc_id'];
++  //         $this->generateSubSection($section_storage, $delta, $original_layout_settings['lc_id'], $new_sub_lc_id);
++  //       }
++  //     }
++  //   }
++  // }
++
+ }
+diff --git a/src/CopySectionRender.php b/src/CopySectionRender.php
+index 7cd881b..b4b90c9 100644
+--- a/src/CopySectionRender.php
++++ b/src/CopySectionRender.php
+@@ -5,11 +5,13 @@ namespace Drupal\lb_copy_section;
+ use Drupal\Core\Render\Element;
+ use Drupal\Core\Security\TrustedCallbackInterface;
+ use Drupal\Core\Url;
++use Drupal\Core\StringTranslation\StringTranslationTrait;
+ 
+ /**
+  * Implements preRender for layout builder.
+  */
+ class CopySectionRender implements TrustedCallbackInterface {
++  use StringTranslationTrait;
+ 
+   /**
+    * {@inheritdoc}
+@@ -33,11 +35,14 @@ class CopySectionRender implements TrustedCallbackInterface {
+     $section_storage = $element['#section_storage'];
+     $copied_section = $tempstore->get('copied_section');
+ 
++    // dump($layout);
+     foreach (Element::children($layout) as $id) {
+ 
+       // Check what kind of element we are looping over.
+       $is_add_link = isset($layout[$id]['link']) && isset($layout[$id]['link']['#url']);
+-      $is_section = isset($layout[$id]['configure']) && isset($layout[$id]['configure']['#url']);
++      // $is_section = isset($layout[$id]['actions']['configure']) && isset($layout[$id]['actions']['configure']['#url']);
++      $is_section = isset($layout[$id]['layout-builder__configure_section']['configure']) && isset($layout[$id]['layout-builder__configure_section']['configure']['#url']);
++
+ 
+       if ($is_add_link && !empty($copied_section)) {
+ 
+@@ -56,8 +61,8 @@ class CopySectionRender implements TrustedCallbackInterface {
+             'attributes' => [
+               'class' => [
+                 'use-ajax',
+-                'layout-builder__link',
+-                'layout-builder__link--add',
++                'icon-paste',
++                'iconfont',
+                 'layout-builder__link--paste-section',
+               ],
+             ],
+@@ -73,7 +78,7 @@ class CopySectionRender implements TrustedCallbackInterface {
+       elseif ($is_section) {
+ 
+         // Collect parameters to generate the link.
+-        $parameters = $layout[$id]['configure']['#url']->getRouteParameters();
++        $parameters = $layout[$id]['layout-builder__configure_section']['configure']['#url']->getRouteParameters();
+         $active_section = $section_storage->getSections()[$parameters['delta']];
+         $layout_settings = $active_section->getLayoutSettings();
+         $section_label = !empty($layout_settings['label']) ? $layout_settings['label'] : t('Section @section', ['@section' => $parameters['delta'] + 1]);
+@@ -89,15 +94,15 @@ class CopySectionRender implements TrustedCallbackInterface {
+             'attributes' => [
+               'class' => [
+                 'use-ajax',
+-                'layout-builder__link',
+-                'layout-builder__link--copy-section',
++                'iconfont',
++                'icon-copy'
+               ],
+             ],
+           ],
+         );
+-        $layout[$id]['copy'] = [
++        $layout[$id]['layout-builder__configure_section']['copy'] = [
+           '#type' => 'link',
+-          '#title' => t('Copy @section', ['@section' => $section_label]),
++          '#title' => t('<span class="visually-hidden">Copy @section</span>', ['@section' => $section_label]),
+           '#url' => $copy_section_url,
+           '#access' => $copy_section_url->access(),
+           '#weight' => 4,
+diff --git a/src/DeepCloningTrait.php b/src/DeepCloningTrait.php
+index 8a79257..0c0f018 100644
+--- a/src/DeepCloningTrait.php
++++ b/src/DeepCloningTrait.php
+@@ -5,6 +5,8 @@ namespace Drupal\lb_copy_section;
+ use Drupal\layout_builder\Plugin\Block\InlineBlock;
+ use Drupal\layout_builder\Section;
+ use Drupal\layout_builder\SectionComponent;
++use \Drupal\Core\Utility\Error;
++use Drupal\Component\Serialization\Json;
+ 
+ /**
+  * A Trait for deep cloning methods for section inline blocks.
+@@ -110,13 +112,17 @@ trait DeepCloningTrait {
+           $configuration['block_serialized'] = serialize($duplicate_entity);
+         }
+         catch (\ReflectionException $e) {
+-          watchdog_exception('section_library', $e);
++          $logger = \Drupal::logger('lb_copy_section');
++          Error::logException($logger, $e);
+         }
+       }
+ 
+       $new_component->setWeight($component->getWeight());
+       $new_component->setConfiguration($configuration);
+ 
++      // Clone subcolumn settings.
++      $this->cloneSubcolumnSettings($section, $new_component, $component);
++
+       // Insert the new component after the old one.
+       $section->insertAfterComponent($uuid, $new_component);
+ 
+@@ -219,4 +225,27 @@ trait DeepCloningTrait {
+     }
+   }
+ 
++  /**
++   * Clone subcoulumn settings.
++   *
++   * @param \Drupal\layout_builder\Section $section
++   *
++   * @param SectionComponent $component
++   *
++   * @param SectionComponent $original_component
++   *
++   */
++  protected function cloneSubcolumnSettings(&$section, $component, $original_component) {
++    $layout_settings = $section->getLayoutSettings();
++    foreach ($layout_settings['regions'] as &$region) {
++      if (isset($region['subcolumn'])) {
++        $json_string = Json::encode($region['subcolumn']);
++        $json_string = str_replace($original_component->getUuid(), $component->getUuid(), $json_string);
++        $subcolumn = json::decode($json_string);
++        $region['subcolumn'] = $subcolumn;
++      }
++    }
++    $section->setLayoutSettings($layout_settings);
++  }
++
+ }
