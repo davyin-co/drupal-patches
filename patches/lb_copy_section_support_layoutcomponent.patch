@@ -195,7 +195,7 @@ index 4ba9fa2..f82c42e 100644
 +
  }
 diff --git a/src/CopySectionRender.php b/src/CopySectionRender.php
-index 7cd881b..b4b90c9 100644
+index 7cd881b..8b919bb 100644
 --- a/src/CopySectionRender.php
 +++ b/src/CopySectionRender.php
 @@ -5,11 +5,13 @@ namespace Drupal\lb_copy_section;
@@ -239,6 +239,15 @@ index 7cd881b..b4b90c9 100644
                  'layout-builder__link--paste-section',
                ],
              ],
+@@ -65,7 +70,7 @@ class CopySectionRender implements TrustedCallbackInterface {
+         );
+         $layout[$id]['paste'] = [
+           '#type' => 'link',
+-          '#title' => t('Paste @section', ['@section' => $section_label]),
++          '#title' => t('Paste Section'),
+           '#url' => $paste_section_url,
+           '#access' => $paste_section_url->access(),
+         ];
 @@ -73,7 +78,7 @@ class CopySectionRender implements TrustedCallbackInterface {
        elseif ($is_section) {
  
