@@ -28,7 +28,7 @@ index 3a2d4a89b..ee9c23f03 100755
      if (empty($queue)) {
        try {
 -        $form_state->setRedirectUrl($entity->toUrl('collection'));
-+        $form_state->setRedirectUrl(\Drupal\Core\Url::fromRoute('manage.media_grid'));
++        $form_state->setRedirectUrl(\Drupal\Core\Url::fromRoute('manage.dam.media_grid'));
        }
        catch (UndefinedLinkTemplateException $e) {
          // The entity type does not declare a collection, so don't do
