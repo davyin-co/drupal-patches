@@ -1,7 +1,7 @@
-diff --git a/docroot/modules/contrib/lightning_media/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php b/docroot/modules/contrib/lightning_media/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php
+diff --git a/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php b/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php
 index 729173741..31ae35099 100644
---- a/docroot/modules/contrib/lightning_media/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php
-+++ b/docroot/modules/contrib/lightning_media/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php
+--- a/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php
++++ b/modules/lightning_media_bulk_upload/src/Form/BulkUploadForm.php
 @@ -148,6 +148,7 @@ public function submitForm(array &$form, FormStateInterface $form_state) {
          'query' => [
            'bulk_create' => implode(',', $bulk_create),
@@ -10,10 +10,10 @@ index 729173741..31ae35099 100644
        ]);
        $form_state->setRedirectUrl($redirect);
      }
-diff --git a/docroot/modules/contrib/lightning_media/src/Form/MediaForm.php b/docroot/modules/contrib/lightning_media/src/Form/MediaForm.php
+diff --git a/src/Form/MediaForm.php b/src/Form/MediaForm.php
 index 2051bd6e0..ad0405d51 100644
---- a/docroot/modules/contrib/lightning_media/src/Form/MediaForm.php
-+++ b/docroot/modules/contrib/lightning_media/src/Form/MediaForm.php
+--- a/src/Form/MediaForm.php
++++ b/src/Form/MediaForm.php
 @@ -134,7 +134,9 @@ public function save(array $form, FormStateInterface $form_state) {
      $next_entity_id = array_shift($queue);
      $next_entity_edit_form = $this->entityTypeManager->getStorage($entity->getEntityTypeId())
