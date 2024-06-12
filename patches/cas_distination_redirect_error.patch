@@ -1,9 +1,9 @@
 diff --git a/src/Controller/ForceLoginController.php b/src/Controller/ForceLoginController.php
-index ee52e2a65..90dba6e2b 100644
+index 475765a52..93a5cbcfc 100644
 --- a/src/Controller/ForceLoginController.php
 +++ b/src/Controller/ForceLoginController.php
-@@ -57,7 +57,9 @@ public function forceLogin() {
-     $service_url_query_params = $this->requestStack->getCurrentRequest()->query->all();
+@@ -69,7 +69,8 @@ public function forceLogin(Request $request) {
+     $service_url_query_params = $request->query->all();
      $cas_redirect_data = new CasRedirectData($service_url_query_params);
      $cas_redirect_data->setIsCacheable(TRUE);
 -    return $this->casRedirector->buildRedirectResponse($cas_redirect_data, TRUE);
