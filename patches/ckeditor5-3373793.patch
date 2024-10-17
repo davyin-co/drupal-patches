@@ -1,0 +1,32 @@
+diff --git a/core/modules/ckeditor5/src/Controller/CKEditor5ImageController.php b/core/modules/ckeditor5/src/Controller/CKEditor5ImageController.php
+index 56360996b7..068257539e 100644
+--- a/core/modules/ckeditor5/src/Controller/CKEditor5ImageController.php
++++ b/core/modules/ckeditor5/src/Controller/CKEditor5ImageController.php
+@@ -187,6 +187,13 @@ public function upload(Request $request) {
+       throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
+     }
+ 
++    try {
++      $this->fileSystem->move($temp_file_path, $file_uri, FileSystemInterface::EXISTS_ERROR);
++    }
++    catch (FileException $e) {
++      throw new HttpException(500, 'Temporary file could not be moved to file location');
++    }
++
+     // Begin building file entity.
+     $file = File::create([]);
+     $file->setOwnerId($this->currentUser->id());
+@@ -201,13 +208,6 @@ public function upload(Request $request) {
+       throw new UnprocessableEntityHttpException($violations->__toString());
+     }
+ 
+-    try {
+-      $this->fileSystem->move($temp_file_path, $file_uri, FileSystemInterface::EXISTS_ERROR);
+-    }
+-    catch (FileException $e) {
+-      throw new HttpException(500, 'Temporary file could not be moved to file location');
+-    }
+-
+     $file->save();
+ 
+     $this->lock->release($lock_id);
