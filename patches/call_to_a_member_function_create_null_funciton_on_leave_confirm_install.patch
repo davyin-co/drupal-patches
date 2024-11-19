@@ -1,0 +1,23 @@
+diff --git a/leave_confirm.install b/leave_confirm.install
+index c1070615a..5b24d9fa2 100644
+--- a/leave_confirm.install
++++ b/leave_confirm.install
+@@ -10,6 +10,9 @@
+  */
+ function leave_confirm_install() {
+
++  $leave_confirm_storage = \Drupal::entityTypeManager()
++    ->getStorage('leave_confirm_point');
++
+   if (!\Drupal::service('config.installer')->isSyncing() && \Drupal::moduleHandler()->moduleExists('node')) {
+     $form_ids = [];
+     $label = [];
+@@ -25,8 +28,6 @@ function leave_confirm_install() {
+       $label[] = 'node_' . $type . '_edit_form';
+     }
+
+-    $leave_confirm_storage = \Drupal::entityTypeManager()
+-      ->getStorage('leave_confirm_point');
+     foreach ($form_ids as $index => $form_id) {
+       $values = [
+         'label' => $label[$index],
