@@ -1,0 +1,46 @@
+diff --git a/src/Controller/TrashController.php b/src/Controller/TrashController.php
+index 57189480e..9d797d7c3 100644
+--- a/src/Controller/TrashController.php
++++ b/src/Controller/TrashController.php
+@@ -14,6 +14,7 @@
+ use Drupal\user\EntityOwnerInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
++use Drupal\Component\Serialization\Json;
+ 
+ /**
+  * Defines a controller to list deleted entities.
+@@ -204,13 +205,31 @@ protected function buildRow(FieldableEntityInterface $entity): array {
+       '#links' => [
+         'restore' => [
+           'title' => t('Restore'),
+-          'url' => $entity->toUrl('restore'),
++          'url' => $entity->toUrl('restore', ['query' => [
++            'destination' => \Drupal::destination()->get()
++          ]]),
+           'weight' => 0,
++          'attributes' => [
++            'class' => ['use-ajax'],
++            'data-dialog-type' => 'modal',
++            'data-dialog-options' => Json::encode([
++              'width' => 700,
++            ]),
++          ]
+         ],
+         'purge' => [
+           'title' => t('Purge'),
+-          'url' => $entity->toUrl('purge'),
++          'url' => $entity->toUrl('purge', ['query' => [
++            'destination' => \Drupal::destination()->get()
++          ]]),
+           'weight' => 5,
++          'attributes' => [
++            'class' => ['use-ajax'],
++            'data-dialog-type' => 'modal',
++            'data-dialog-options' => Json::encode([
++              'width' => 700,
++            ]),
++          ]
+         ],
+       ],
+     ];
