@@ -2,13 +2,16 @@ diff --git a/lib/Drupal/Core/Entity/EntityChangesDetectionTrait.php b/lib/Drupal
 index cde4d834c..79e34ee11 100644
 --- a/lib/Drupal/Core/Entity/EntityChangesDetectionTrait.php
 +++ b/lib/Drupal/Core/Entity/EntityChangesDetectionTrait.php
-@@ -36,6 +36,9 @@ protected function getFieldsToSkipFromTranslationChangesCheck(ContentEntityInter
+@@ -35,6 +35,12 @@ protected function getFieldsToSkipFromTranslationChangesCheck(ContentEntityInter
+       if ($field_definition->isComputed()) {
          $fields[] = $field_name;
        }
-     }
++      if($field_definition->getType() == 'panelizer'){
++        $fields[] = $field_name;
++      }
++    }
 +    if(\Drupal::moduleHandler()->moduleExists('multiversion')){
 +      array_push($fields, '_rev');
-+    }
- 
+     }
+
      return $fields;
-   }

@@ -1,0 +1,32 @@
+diff --git a/eu_cookie_compliance.libraries.yml b/eu_cookie_compliance.libraries.yml
+index 03a24a8..df5f297 100644
+--- a/eu_cookie_compliance.libraries.yml
++++ b/eu_cookie_compliance.libraries.yml
+@@ -1,5 +1,4 @@
+ eu_cookie_compliance:
+-  version: VERSION
+   js:
+     js/eu_cookie_compliance.js: { attributes: { defer: true } }
+   dependencies:
+@@ -9,21 +8,18 @@ eu_cookie_compliance:
+     - core/once
+     - core/js-cookie
+ eu_cookie_compliance_default:
+-  version: VERSION
+   css:
+     state:
+       css/eu_cookie_compliance.css: {}
+   dependencies:
+     - eu_cookie_compliance/eu_cookie_compliance
+ eu_cookie_compliance_bare:
+-  version: VERSION
+   css:
+     state:
+       css/eu_cookie_compliance.bare.css: {}
+   dependencies:
+     - eu_cookie_compliance/eu_cookie_compliance
+ eu_cookie_compliance_olivero:
+-  version: VERSION
+   css:
+     state:
+       css/eu_cookie_compliance_olivero.css: {}
